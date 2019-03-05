@@ -3,6 +3,9 @@ vendor_extra
 
 Contains patches &amp; useful command for pulling logs dmesg & kmsg, Making a full build, making bootimage, systemimage, recoveryimage & kernel plus taking screenshot& fixing sepolicy error.
 
+# List Of Command BuiltinTo The Tool 
+
+
 | Commend |  Discriptoon|
 |--|--|
 | rs | Trigger sync repo |
