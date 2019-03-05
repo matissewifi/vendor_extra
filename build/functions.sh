@@ -92,48 +92,21 @@ function func_colors()
     CL_W="\e[0m"
 }
 
-function func_repos()
-{
-    if [ ! -d ".repo/local_manifests" ]
-    then
-        rsync -a vendor/extra/local_manifests/*.xml .repo/local_manifests/;
-        echo -e "${CL_GRN} * Local Manifest initialised, syncing now...\n${CL_RST}";
-        repo sync -j100 --force-sync 2&> /dev/null;
-    else
-        rsync -avc --stats --exclude=du_manifest.xml vendor/extra/local_manifests/*.xml .repo/local_manifests/ >/tmp/rsync;
-    fi
-        if ! `sed '/xml/!d' /tmp/rsync`&> /dev/null; then repo sync -j100 --force-sync; fi
-
-        echo -e "${CL_GRN} * Setup repos${CL_RST}"
-        echo -e "${CL_LBL}   "`sed '/xml/!d' /tmp/rsync`"\n${CL_RST}"
-}
-
 function func_alias()
-{
+{	
 	alias dn="echo $(sed "s/lineage_//" <<< "${TARGET_PRODUCT}")"
 	#Update Tools
-	alias udt="repo sync -c -d --force-sync BAProductions/vendor_extra && . build/envsetup.sh && show_alias"
+	#alias udt="repo sync -c -d --force-sync BAProductions/vendor_extra && . build/envsetup.sh && show_alias"
 	#Repo Sync Command
 	alias rs="repo sync -c -d --force-sync && . build/envsetup.sh && show_alias"
     alias arb="cd vendor/cm/ && git am --abort && cd ../.. && . build/envsetup.sh && show_alias"
-	#Nexus 7 More Control Panel
-    alias lgrou="lunch aosp_grouper-user -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    alias lgroud="lunch aosp_grouper-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    alias lgroeng="lunch aosp_grouper-eng -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-	#Samsung Galaxy Tab E 9.6 WiFi New Tablet
-    alias lgteu="lunch lineage_gtelwifiue-user-j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    alias lgteud="lunch lineage_gtelwifiue-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    alias lgteeng="lunch lineage_gtelwifiue-eng -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-	#Samsung Galaxy Tab 4 10.1 WiFi Old Tablet
+    #Samsung Galaxy Tab 4 10.1 WiFi Old Tablet
     alias lmu="lunch lineage_matissewifi-user -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
     alias lmud="lunch lineage_matissewifi-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_aliass"
     alias lmeng="lunch lineage_matissewifi-eng -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    alias mofmbeng="mka clobber -j$(expr $(nproc --all) \* 10) && breakfast lineage_matissewifi-eng -j$(expr $(nproc --all) \* 10) && mka target-files-package dist otatools"
-    alias mofmbud="mka clobber -j$(expr $(nproc --all) \* 10) && breakfast lineage_matissewifi-userdebug -j$(expr $(nproc --all) \* 10) && mka target-files-package dist otatools"
     if [ $(sed 's/lineage_//' <<< "${TARGET_PRODUCT}") == "matissewifi" ]
 		then 
-		#Samsung Galaxy Tab 4 10.1 WiFi Old Tablet Extre
-		alias mmdv="mka clobber -j$(expr $(nproc --all) \* 10) && brunch lineage_matissewifi-eng  WITH_DEXPREOPT=true -j$(expr $(nproc --all) \* 10)  && adb wait-for-device reboot recovery";
+		#Samsung Galaxy Tab 4 10.1 Extra Command
 		alias mcl="mka camera.msm8226 -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/matissewifi/system/lib/hw/camera.msm8226.so system/lib/hw/ && adb shell chmod 0644 system/lib/hw/camera.msm8226.so && adb reboot && adb wait-for-device logcat | grep --color=auto -E 'camera|preview|sr|selinux|not found|sepolicy|avc|policy|rev'";
 		alias mcs="mka libmmcamera_sr130pc20_shim -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/matissewifi/system/lib/libmmcamera_sr130pc20_shim.so system/lib/ && adb shell chmod 0644 system/lib/libmmcamera_sr130pc20_shim.so && adb reboot && adb wait-for-device logcat | grep --color=auto -E 'camera|preview|sr|selinux|not found|sepolicy|avc|policy|rev'";
 	fi
@@ -148,47 +121,36 @@ function func_alias()
     alias mop2="repo sync -c -d --force-sync && mka systemimage -j$(expr $(nproc --all) \* 10) && mka otapackage -j$(expr $(nproc --all) \* 10) && adb wait-for-device reboot recovery"
     #Logcat Command
     alias tlc="adb wait-for-device logcat"
-    alias tlcf=". build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat|tee >> ~/$rom_dir/logcat-$(date +"%m-%d-%Y\ %T").log"
+    alias tlcf=". build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat|tee >> $home_dir/logcat-$(date +"%m-%d-%Y\ %T").log"
     alias tlcfe=". build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat *:E|tee >> ~/$rom_dir/logcat-e-$(date +"%m-%d-%Y\ %T").log"
+	#Kmesg Command
     alias rkm="adb wait-for-device shell cat /proc/kmsg"
-    alias rkmf=". build/envsetup.sh && show_alias && adb wait-for-device shell cat /proc/kmsg | tee >> ~/$rom_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
-    alias rfkmf=". build/envsetup.sh && show_alias && adb reboot && adb wait-for-device shell cat /proc/kmsg |tee >> ~/$rom_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
+    alias rkmf=". build/envsetup.sh && show_alias && adb wait-for-device shell cat /proc/kmsg | tee >> $home_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
+    alias rfkmf=". build/envsetup.sh && show_alias && adb reboot && adb wait-for-device shell cat /proc/kmsg |tee >> $home_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
+	#Dmesg Command
     alias rdm="adb wait-for-device shell dmesg"
-    alias rdmf=". build/envsetup.sh && show_alias && adb wait-for-device shell dmsg | tee >> ~/$rom_dir/dmsg-$(date +"%m-%d-%Y\ %T").log"
+    alias rdmf=". build/envsetup.sh && show_alias && adb wait-for-device shell dmsg | tee >> $home_dir/dmsg-$(date +"%m-%d-%Y\ %T").log"
     alias dw="adb shell 'su -c \"svc wifi disable\"'"
     alias ew="adb shell 'su -c \"svc wifi enable\"'"
-    alias msuiapk="mka SystemUI -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/$(sed 's/lineage_//' <<< "${TARGET_PRODUCT}")/system/priv-app/SystemUI/SystemUI.apk system/priv-app/SystemUI/ && adb reboot"
-    alias mssapk="mka Settings -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/$(sed 's/lineage_//' <<< "${TARGET_PRODUCT}")/system/priv-app/Settings/Settings.apk system/priv-app/Settings/ && adb reboot"
-    alias tss=". build/envsetup.sh && show_alias && adb shell screencap -p /sdcard/screen.png && adb pull /sdcard/screen.png && mv screen.png ~/$rom_dir/screen-$(date +"%m-%d-%Y\ %T").png &&  adb shell rm -f /sdcard/.screen.png"
-    alias fsep="adb pull /sys/fs/selinux/policy && adb logcat -b all -d | audit2allow -p policy"
-    alias sabao="croot && for otaupdate in out/dist/*-target_files-*.zip; do ./build/tools/releasetools/sign_target_files_apks -o -d ~/.android-certs $otaupdate $(echo "signed-$(echo "$otaupdate" | sed -e 's/out\/dist\///')"); done && for signedotaupdate in $(ls *-target_files-*.zip); do ./build/tools/releasetools/ota_from_target_files -k ~/.android-certs/releasekey --block --backup=true $signedotaupdate $(sed 's/signed-//' <<< "$signedotaupdate"); done;"    
+    alias tss=". build/envsetup.sh && show_alias && adb shell screencap -p /sdcard/screen.png && adb pull /sdcard/screen.png && mv $home_dir/screen.png $home_dir/screen-$(date +"%m-%d-%Y\ %T").png &&  adb shell rm -f /sdcard/.screen.png"
+	#sepolicy Fix Command
+    alias fsep="adb pull /sys/fs/selinux/policy $home_dir/ && adb logcat -b all -d | audit2allow -p policy"
 }
 
 function show_alias()
 {
-	echo -e "\nUpdate Tools"
-	echo -e "${CL_LBL}\nudt${CL_RST}\trepo sync -c -d --force-sync BAProductions/vendor_extra && . build/envsetup.sh && show_alias"
+	#echo -e "\nUpdate Tools"
+	#echo -e "${CL_LBL}\nudt${CL_RST}\trepo sync -c -d --force-sync BAProductions/vendor_extra && . build/envsetup.sh && show_alias"
 	echo -e "\nRepo Sync Commend"
 	echo -e "${CL_LBL}\nrs${CL_RST}\trepo sync -c -d --force-sync && . build/envsetup.sh && show_alias"
     echo -e "${CL_LBL}\narb${CL_RST}\tcd vendor/cm/ && git am --abort && cd ../.. && . build/envsetup.sh && show_alias"
-    echo -e "\nNexus 7 Forever More Control Panel"
-	echo -e "${CL_LBL}\nlgrou${CL_RST}\tlunch aosp_grouper-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "${CL_LBL}\nlgroud${CL_RST}\tlunch aosp_grouper-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "${CL_LBL}\nlgroeng${CL_RST}\tlunch aosp_grouper-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "\nSamsung Galaxy Tab E 9.6 WiFi New Tablet"
-	echo -e "${CL_LBL}\nlgteu${CL_RST}\tlunch lineage_gtelwifiue-user -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "${CL_LBL}\nlgteud${CL_RST}\tlunch lineage_gtelwifiue-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "${CL_LBL}\nlgteeng${CL_RST}\tlunch lineage_gtelwifiue-eng -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "\nSamsung Galaxy Tab 4 10.1 WiFi Old Tablet"
+    echo -e "\nSamsung Galaxy Tab 4 10.1 WiFi"
 	echo -e "${CL_LBL}\nlmu${CL_RST}\tlunch lineage_matissewifi-user -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
     echo -e "${CL_LBL}\nlmud${CL_RST}\tlunch lineage_matissewifi-userdebug -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
     echo -e "${CL_LBL}\nlmeng${CL_RST}\tlunch lineage_matissewifi-eng -j$(expr $(nproc --all) \* 10) && . build/envsetup.sh && show_alias"
-    echo -e "${CL_LBL}\nmofmbeng${CL_RST}\tmka clobber -j$(expr $(nproc --all) \* 10) && breakfast lineage_matissewifi-eng -j$(expr $(nproc --all) \* 10) && mka target-files-package dist otatools"
-    echo -e "${CL_LBL}\nmofmbud${CL_RST}\tmka clobber -j$(expr $(nproc --all) \* 10) && breakfast lineage_matissewifi-userdebug -j$(expr $(nproc --all) \* 10) && mka target-files-package dist otatools"
 	if [ $(sed 's/lineage_//' <<< "${TARGET_PRODUCT}") == "matissewifi" ]
 		then
-		echo -e "\nSamsung Galaxy Tab 4 10.1 WiFi Old Tablet Extra Command"
-		echo -e "${CL_LBL}\nmmdv${CL_RST}\tmka clobber -j$(expr $(nproc --all) \* 10) && brunch lineage_matissewifi-eng -j$(expr $(nproc --all) \* 10)  &&  adb wait-for-device reboot recovery";
+		echo -e "\nSamsung Galaxy Tab 4 10.1 Extra Command"
 		echo -e "${CL_LBL}\nmcl${CL_RST}\tmka camera.msm8226 -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/matissewifi/system/lib/hw/camera.msm8226.so system/lib/hw/ && adb shell chmod 0644 system/lib/hw/camera.msm8226.so && adb reboot && adb wait-for-device logcat | grep --color=auto -E 'camera|preview|sr|selinux|not found|sepolicy|avc|policy|rev'";
 		echo -e "${CL_LBL}\nmcs${CL_RST}\tmka libmmcamera_sr130pc20_shim -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/matissewifi/system/lib/libmmcamera_sr130pc20_shim.so system/lib/ && adb shell chmod 0644 system/lib/libmmcamera_sr130pc20_shim.so && adb reboot && adb wait-for-device logcat | grep --color=auto -E 'camera|preview|sr|selinux|not found|sepolicy|avc|policy|rev'";
 	fi
@@ -200,25 +162,22 @@ function show_alias()
     echo -e "${CL_LBL}\nmk${CL_RST}\tmka kernel -j$(expr $(nproc --all) \* 10) && adb wait-for-device reboot recovery"
     echo -e "${CL_LBL}\nmri${CL_RST}\tmka recoveryimage -j$(expr $(nproc --all) \* 10) && adb wait-for-device reboot recovery && adb wait-for-recovery push out/target/product//recovery.img sdcard"
     echo -e "${CL_LBL}\nmop${CL_RST}\tmka otapackage -j$(expr $(nproc --all) \* 10) && mop && adb wait-for-device reboot recovery"
-        echo -e "\nLogcat Command"
+    echo -e "\nLogcat Command"
     echo -e "${CL_LBL}\ntlc${CL_RST}\tadb wait-for-device logcat"
-    echo -e "${CL_LBL}\ntlcf${CL_RST}\t. build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat | tee >> ~/$rom_dir/logcat-$(date +"%m-%d-%Y\ %T").log"
-    echo -e "${CL_LBL}\ntlcfe${CL_RST}\t. build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat *:E | tee >> ~/$rom_dir/logcat-e-$(date +"%m-%d-%Y\ %T").log"
-    	echo -e "\nKmsg Command"
+    echo -e "${CL_LBL}\ntlcf${CL_RST}\t. build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat | tee >> $home_dir/logcat-$(date +"%m-%d-%Y\ %T").log"
+    echo -e "${CL_LBL}\ntlcfe${CL_RST}\t. build/envsetup.sh && show_alias && adb reboot && adb wait-for-device logcat *:E | tee >> $home_dir/logcat-e-$(date +"%m-%d-%Y\ %T").log"
+    echo -e "\nKmsg Command"
     echo -e "${CL_LBL}\nrkm${CL_RST}\tadb wait-for-device shell cat /proc/kmsg"
-    echo -e "${CL_LBL}\nrkmf${CL_RST}\t. build/envsetup.sh && show_alias && adb wait-for-device shell cat /proc/kmsg | tee >> ~/$rom_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
+    echo -e "${CL_LBL}\nrkmf${CL_RST}\t. build/envsetup.sh && show_alias && adb wait-for-device shell cat /proc/kmsg | tee >> $home_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
     echo -e "${CL_LBL}\nrfkmf${CL_RST}\t. build/envsetup.sh && show_alias && adb reboot && adb wait-for-device shell cat /proc/kmsg |tee >> ~/$rom_dir/kmesg-$(date +"%m-%d-%Y\ %T").log"
-    	echo -e "\nDmesg Command"
+    echo -e "\nDmesg Command"
     echo -e "${CL_LBL}\nrdm${CL_RST}\tadb wait-for-device shell dmesg"
-    echo -e "${CL_LBL}\nrdmf${CL_RST}\t. build/envsetup.sh && show_alias && adb wait-for-device shell dmesg | tee >> ~/$rom_dir/dmesg-$(date +"%m-%d-%Y\ %T").log"
-    	echo -e "\nWiFi Command"
+    echo -e "${CL_LBL}\nrdmf${CL_RST}\t. build/envsetup.sh && show_alias && adb wait-for-device shell dmesg | tee >> $home_dir/dmesg-$(date +"%m-%d-%Y\ %T").log"
+    echo -e "\nWiFi Command"
     echo -e "${CL_LBL}\ndw${CL_RST}\tadb shell 'su -c "\"svc wifi disable"\"'"
     echo -e "${CL_LBL}\new${CL_RST}\tadb shell 'su -c "\"svc wifi enable"\"'"
 	echo -e "\nOther Command"
-    echo -e "${CL_LBL}\nmsuiapk${CL_RST}\tmka SystemUI -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/$(sed 's/lineage_//' <<< "${TARGET_PRODUCT}")/system/priv-app/SystemUI/SystemUI.apk system/priv-app/SystemUI/ && adb reboot"
-    echo -e "${CL_LBL}\nmssapk${CL_RST}\tmka Settings -j$(expr $(nproc --all) \* 10) && adb remount && adb push out/target/product/$(sed 's/lineage_//' <<< "${TARGET_PRODUCT}")/system/priv-app/Settings/Settings.apk system/priv-app/Settings/ && adb reboot"
-    echo -e "${CL_LBL}\ntss${CL_RST}\t. build/envsetup.sh && show_alias && adb shell screencap -p /sdcard/screen.png && adb pull /sdcard/screen.png && mv screen.png ~/$rom_dir/screen-$(date +"%m-%d-%Y\ %T").png &&  adb shell rm -f /sdcard/.screen.png"
+    echo -e "${CL_LBL}\ntss${CL_RST}\t. build/envsetup.sh && show_alias && adb shell screencap -p /sdcard/screen.png && adb pull /sdcard/screen.png && mv $home_dir/screen.png $home_dir/screen-$(date +"%m-%d-%Y\ %T").png &&  adb shell rm -f /sdcard/.screen.png"
     echo -e "${CL_LBL}\nfsep${CL_RST}\tadb pull /sys/fs/selinux/policy && adb logcat -b all -d | audit2allow -p policy"
-    echo -e "${CL_LBL}\nsabao${CL_RST}\tcroot && for otaupdate in out/dist/*-target_files-*.zip; do ./build/tools/releasetools/sign_target_files_apks -o -d ~/.android-certs $otaupdate $(echo "signed-$(echo "$otaupdate" | sed -e 's/out\/dist\///')"); done && for signedotaupdate in $\e(((ls *-target_files-*.zip); do ./build/tools/releasetools/ota_from_target_files -k ~/.android-certs/releasekey --block --backup=true $signedotaupdate $(sed 's/signed-//' <<<"$signedotaupdate"); done;"
     echo -e "${CL_LBL}\n${CL_RST}"
 }
