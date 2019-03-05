@@ -1,5 +1,6 @@
 ccache_use=1
 ccache_dir=/home/"$(whoami)"/ccache
+main_dir=/home/"$(whoami)"
 ccache_size=25G
 
 #cm/du/omni
