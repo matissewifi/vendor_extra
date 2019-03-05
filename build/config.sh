@@ -6,5 +6,5 @@ ccache_size=25G
 #cm/du/omni
 rom_type=cm 
 
-with_su=1
+with_su=0
 jobs=5
