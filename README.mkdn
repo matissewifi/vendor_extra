@@ -2,7 +2,7 @@ vendor_extra
 ----------------
 
 Contains patches &amp; useful command for pulling logs dmesg & kmsg, Making a full build, making bootimage, systemimage, recoveryimage & kernel plus taking screenshot & fixing sepolicy error etc..
-Alse this apply helthd patches located in matissewifi/android_vendor_samsung_matisse-common to enable home button pressing to dicplay battery animation in offmode charging. More patches will added to enable cool feture like autopower on if device has 15% batter or more.
+Alse this apply helthd patches located in matissewifi/android_vendor_samsung_matisse-common to enable home button pressing to dicplay battery animation in offmode charging.
 
 # List Of Command BuiltinTo The Tool 
 
